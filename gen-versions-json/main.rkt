@@ -65,15 +65,8 @@ If a specified directory has changed files under it
      [("-l" "--link-flags") lf ; flag takes one argument
                             "Add a flag <lf> for the linker"
                             (link-flags (cons lf (link-flags)))]
-     #:args (filename) ; expect one command-line argument: <filename>
-     ; return the argument as a filename to compile
-     filename))
+     ))
 
     (printf "verbose: ~a\n" (verbose-mode))
-    (printf "profiling-on: ~a\n" (profiling-on))
-    (printf "optimize-level: ~a\n" (optimize-level))
-    (printf "link-flags: ~a\n" (link-flags))
     ;(printf "filename: ~a\n" file-to-compile)
-    (foo file-to-compile)
-    (git-diff)
-    )
+    (generate-json))
