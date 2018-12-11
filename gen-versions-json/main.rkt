@@ -4,15 +4,20 @@
 ;;   Generate custom versions.json file, a map of top level directories to SHA
 ;;   prefix. Used for cache breaking
 
+#|
+git diff --name-only HEAD~1..HEAD .
+If a specified directory has changed files under it
+  Map the directory sha to the current Repo SHA 
+|#
 ;;
 ;; Copyright (c) 2018 Robert J. Berger (rberger@ibd.com).
 
 ;; Racket Style Guide: http://docs.racket-lang.org/style/index.html
 
-(require racket/contract)
+;; (require racket/contract)
 
-(provide
- (contract-out))
+;; (provide
+;;  (contract-out))
 
 ;; ---------- Requirements
 
@@ -68,4 +73,7 @@
     (printf "profiling-on: ~a\n" (profiling-on))
     (printf "optimize-level: ~a\n" (optimize-level))
     (printf "link-flags: ~a\n" (link-flags))
-    (printf "filename: ~a\n" file-to-compile))
+    ;(printf "filename: ~a\n" file-to-compile)
+    (foo file-to-compile)
+    (git-diff)
+    )
