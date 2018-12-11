@@ -40,13 +40,27 @@
 (define (git-diff)
   (sys "git diff --name-only HEAD~1..HEAD ."))
 
+;; git log -n 1 --pretty=format:"%h" retailers/bloomingdales/bloomingdalesnynormal003/
+
 (define (generate-json)
-  (define raw-list (git-diff))
+  (define short-sha (sys "git rev-parse --short HEAD"))
+  ;;(define raw-list (git-diff))
+  (define raw-list (sys "ls -d retailers/*/*"))
+
   (define no-prefix (map (lambda (str)
                            (string-trim str #rx"retailers/" #:right? #f)) raw-list))
   (define changed-dirs (map (lambda (str)
                               (string-split str "/" #:repeat? #t)) no-prefix))
+  (define remove-files (filter (lambda (str-list)
+                                 (> (length str-list) 1)) changed-dirs))
   (define final-dirs (map (lambda (str-list)
-                          (string-join (list (first str-list) (second str-list)) "/")) changed-dirs))
-  final-dirs
+                          (string-join (list (first str-list) (second str-list)) "/")) remove-files))
+  (printf "sha: ~a final-dirs: ~a" short-sha final-dirs)
+  ;; (define results (make-hash))
+
+  ;; (for ([dir final-dirs])
+  ;;   Lookup short sha for retailers/dir
+  ;;   Assign dir and the short sha to results hash
+  ;;   )
+  ;; Convert results hash to json
   )
