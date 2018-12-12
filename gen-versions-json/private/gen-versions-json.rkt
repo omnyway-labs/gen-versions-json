@@ -26,6 +26,7 @@
 (require racket/string)
 (require racket/list)
 (require json)
+(require threading)
 
 (module+ test
   (require rackunit)
@@ -38,26 +39,23 @@
   (string-split (with-output-to-string (lambda () (system cmd))) "\n"))
 
 (define (generate-json)
-  (define short-sha (sys "git rev-parse --short HEAD"))
   (define raw-list (sys "ls -d retailers/*/*"))
-
-  (define no-prefix (map (lambda (str)
-                           (string-trim str #rx"retailers/" #:right? #f)) raw-list))
-  (define changed-dirs (map (lambda (str)
-                              (string-split str "/" #:repeat? #t)) no-prefix))
-  (define remove-files (filter (lambda (str-list)
-                                 (> (length str-list) 1)) changed-dirs))
-  (define final-dirs (map (lambda (str-list)
-                          (string-join (list (first str-list) (second str-list)) "/")) remove-files))
-  ;; (printf "sha: ~a final-dirs: ~a" short-sha final-dirs)
   (define results (make-hash))
 
-  (for ([dir final-dirs])
-    ;;   Lookup short sha for retailers/dir
-    (define sha (first (sys (format "git log -n 1 --pretty=format:'%h' retailers/~a" dir))))
-    ;;   Assign dir and the short sha to results hash
-    (hash-set! results (string->symbol dir) sha))
+  (for ([dir raw-list])
+    (define split-dir (~> dir
+        (string-trim #rx"retailers/" #:right? #f)
+        (string-split "/" #:repeat? #t)))
+    (cond
+      [(> (length split-dir) 1) ;; Filter out any single level directories
+        (let ([final-dir (string-join (list (first split-dir) (second split-dir)) "/")])
+          (~> final-dir
+            ;;   Lookup short sha for retailers/dir
+            (format "git log -n 1 --pretty=format:'%h' retailers/~a" _)
+            sys
+            first
+            ;;   Assign dir and the short sha to results hash
+            (hash-set! results (string->symbol final-dir) _)))]))
 
   ;; Convert results hash to json
-  (displayln (jsexpr->string results))
-  )
+  (displayln (jsexpr->string results)))
