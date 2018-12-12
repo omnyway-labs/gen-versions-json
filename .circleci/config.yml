@@ -20,7 +20,6 @@ jobs:
           echo "yes\n\n" | /bin/sh racket-${RACKET_VERSION}-x86_64-linux.sh
           raco setup
       - run: raco pkg config --set catalogs "https://download.racket-lang.org/releases/$RACKET_VERSION/catalog/" "https://pkg-build.racket-lang.org/server/built/catalog/" "https://pkgs.racket-lang.org" "https://planet-compats.racket-lang.org"
-
       - run: git checkout master
       - run: |
           raco setup
@@ -29,6 +28,21 @@ jobs:
           raco exe -o bin/gen-versions-json gen-versions-json/main.rkt
           raco distribute dist bin/gen-versions-json
           tar jcvf gen-versions-json.tar.bz2 -C dist .
+      - run: |
+          wget https://github.com/omnyway-labs/rico/releases/download/0.1.4/semver-from-git.tar.bz2
+          tar jxvf semver-from-git.tar.bz2
+          sudo mv semver-from-git/bin/semver-from-git /usr/local/bin/semver-from-git && chmod +x /usr/local/bin/semver-from-git
+          sudo mv semver-from-git/lib/* /usr/local/lib/
+          sudo rm -rf semver-from-git.tar.bz2
+      - run: |
+          wget https://github.com/aktau/github-release/releases/download/v0.7.2/linux-amd64-github-release.tar.bz2
+          tar jxvf linux-amd64-github-release.tar.bz2
+          mv bin/linux/amd64/github-release /usr/local/bin/github-release
+          chmod +x /usr/local/bin/github-release
+          rm -f linux-amd64-github-release.tar.bz2
+      - run: semver-from-git $VERSION_FILE
+      - run: export SEMVER=$(cat $VERSION_FILE); github-release release --user omnyway-labs --repo gen-versions-json --tag $SEMVER  --target $CIRCLE_SHA1
+      - run: export SEMVER=$(cat $VERSION_FILE); github-release upload --user omnyway-labs --repo gen-versions-json --tag $SEMVER  --name gen-versions-json.tar.bz2 --file gen-versions-json.tar.bz2
 workflows:
   version: 2
   build_test_release:
