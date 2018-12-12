@@ -32,20 +32,13 @@
   ;; only use for internal tests, use check- functions 
   (check-true "dummy first test" #f))
 
-(provide generate-json
-         git-diff
-         sys)
+(provide generate-json)
+
 (define (sys cmd)
   (string-split (with-output-to-string (lambda () (system cmd))) "\n"))
 
-(define (git-diff)
-  (sys "git diff --name-only HEAD~1..HEAD ."))
-
-;; git log -n 1 --pretty=format:"%h" retailers/bloomingdales/bloomingdalesnynormal003/
-
 (define (generate-json)
   (define short-sha (sys "git rev-parse --short HEAD"))
-  ;;(define raw-list (git-diff))
   (define raw-list (sys "ls -d retailers/*/*"))
 
   (define no-prefix (map (lambda (str)
@@ -66,5 +59,5 @@
     (hash-set! results (string->symbol dir) sha))
 
   ;; Convert results hash to json
-  (write-json results)
+  (displayln (jsexpr->string results))
   )

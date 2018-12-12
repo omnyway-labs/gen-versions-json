@@ -48,25 +48,10 @@ If a specified directory has changed files under it
 
   (define file-to-compile
     (command-line
-     #:program "compiler"
+     #:program "gen-versions-json"
      #:once-each
      [("-v" "--verbose") "Compile with verbose messages"
                          (verbose-mode #t)]
-     [("-p" "--profile") "Compile with profiling"
-                         (profiling-on #t)]
-     #:once-any
-     [("-o" "--optimize-1") "Compile with optimization level 1"
-                            (optimize-level 1)]
-     ["--optimize-2"        (; show help on separate lines
-                             "Compile with optimization level 2,"
-                             "which includes all of level 1")
-                            (optimize-level 2)]
-     #:multi
-     [("-l" "--link-flags") lf ; flag takes one argument
-                            "Add a flag <lf> for the linker"
-                            (link-flags (cons lf (link-flags)))]
      ))
 
-    (printf "verbose: ~a\n" (verbose-mode))
-    ;(printf "filename: ~a\n" file-to-compile)
     (generate-json))
