@@ -38,5 +38,11 @@ htmldocs: $(SCRBL)
 		\
 		$(SCRBL)
 
+
+dist:
+	mkdir -p bin dist
+	raco exe -o bin/gen-versions-json gen-versions-json/main.rkt
+	raco distribute dist bin/gen-versions-json
+	tar jcvf gen-versions-json.tar.bz2 -C dist .
 viewdocs:
 	raco docs

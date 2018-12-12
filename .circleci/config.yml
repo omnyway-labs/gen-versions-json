@@ -1,0 +1,36 @@
+version: 2
+jobs:
+  release:
+    parallelism: 1
+    working_directory: ~/gen-versions-json
+    docker:
+      - image: debian
+    environment:
+      - VERSION_FILE: ../VERSION
+      - RACKET_VERSION: 7.1
+      - TERM: xterm
+      - DEBIAN_FRONTEND: noninteractive
+    steps:
+      - checkout
+      - run: |
+          apt-get update
+          apt-get install -y wget sqlite3 ca-certificates openssl procps bzip2 git
+          rm -rf /var/lib/apt/lists/*
+          wget https://mirror.racket-lang.org/installers/${RACKET_VERSION}/racket-${RACKET_VERSION}-x86_64-linux.sh
+          echo "yes\n\n" | /bin/sh racket-${RACKET_VERSION}-x86_64-linux.sh
+          raco setup
+      - run: raco pkg config --set catalogs "https://download.racket-lang.org/releases/$RACKET_VERSION/catalog/" "https://pkg-build.racket-lang.org/server/built/catalog/" "https://pkgs.racket-lang.org" "https://planet-compats.racket-lang.org"
+
+      - run: git checkout master
+      - run: |
+          raco setup
+          raco pkg install threading
+          mkdir -p bin dist
+          raco exe -o bin/gen-versions-json gen-versions-json/main.rkt
+          raco distribute dist bin/gen-versions-json
+          tar jcvf gen-versions-json.tar.bz2 -C dist .
+workflows:
+  version: 2
+  build_test_release:
+    jobs:
+      - release
