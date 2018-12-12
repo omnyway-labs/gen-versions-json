@@ -40,9 +40,8 @@
 
 (define (generate-json)
   (define raw-list (sys "ls -d retailers/*/*"))
-  (define results (make-hash))
 
-  (for ([dir raw-list])
+  (define results (for/hash ([dir raw-list])
     (define split-dir (~> dir
         (string-trim #rx"retailers/" #:right? #f)
         (string-split "/" #:repeat? #t)))
@@ -54,8 +53,9 @@
             (format "git log -n 1 --pretty=format:'%h' retailers/~a" _)
             sys
             first
-            ;;   Assign dir and the short sha to results hash
-            (hash-set! results (string->symbol final-dir) _)))]))
+
+            ;; The final pair to be added to the results hash
+            (values (string->symbol final-dir) _)))])))
 
   ;; Convert results hash to json
   (displayln (jsexpr->string results)))
