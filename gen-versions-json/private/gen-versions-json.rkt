@@ -25,6 +25,7 @@
 (require racket/port)
 (require racket/string)
 (require racket/list)
+(require json)
 
 (module+ test
   (require rackunit)
@@ -55,12 +56,15 @@
                                  (> (length str-list) 1)) changed-dirs))
   (define final-dirs (map (lambda (str-list)
                           (string-join (list (first str-list) (second str-list)) "/")) remove-files))
-  (printf "sha: ~a final-dirs: ~a" short-sha final-dirs)
-  ;; (define results (make-hash))
+  ;; (printf "sha: ~a final-dirs: ~a" short-sha final-dirs)
+  (define results (make-hash))
 
-  ;; (for ([dir final-dirs])
-  ;;   Lookup short sha for retailers/dir
-  ;;   Assign dir and the short sha to results hash
-  ;;   )
+  (for ([dir final-dirs])
+    ;;   Lookup short sha for retailers/dir
+    (define sha (first (sys (format "git log -n 1 --pretty=format:'%h' retailers/~a" dir))))
+    ;;   Assign dir and the short sha to results hash
+    (hash-set! results (string->symbol dir) sha))
+
   ;; Convert results hash to json
+  (write-json results)
   )
