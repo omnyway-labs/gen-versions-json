@@ -12,23 +12,32 @@
 
 ## Modules
 
-* `gen-versions-json` - TBD.
+* `gen-versions-json` 
+
+Not much to do with the module. Its mainly used by the CLI to run as a program.
 
 ## Example
 
-```scheme
-(require gen-versions-json)
+Only useful to run in the top level of the `omnypay/haiwai-retailers-assets` repo. 
 
-;; add example here
+Will output a json blob that can be saved to a file.
+```
+cd <path-to-working-dir>/haiwai-retailers/assets
+gen-versions.json > versions.json
 ```
 
 
 ## Installation
 
+* Change to the `gen-versions-dir` subdirectory of this repo
+* Install dependency: `raco  pkg install threading`
 * To install (from within the package directory): `raco pkg install`
-* To install (once uploaded to [pkgs.racket-lang.org](https://pkgs.racket-lang.org/)): `raco pkg install gen-versions-json`
 * To uninstall: `raco pkg remove gen-versions-json`
 * To view documentation: `raco docs gen-versions-json`
+
+## Distribution
+
+* To build for private distribution: `make dist`
 
 ## History
 
