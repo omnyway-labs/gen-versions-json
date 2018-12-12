@@ -31,9 +31,9 @@ jobs:
       - run: |
           wget https://github.com/omnyway-labs/rico/releases/download/0.1.4/semver-from-git.tar.bz2
           tar jxvf semver-from-git.tar.bz2
-          sudo mv semver-from-git/bin/semver-from-git /usr/local/bin/semver-from-git && chmod +x /usr/local/bin/semver-from-git
-          sudo mv semver-from-git/lib/* /usr/local/lib/
-          sudo rm -rf semver-from-git.tar.bz2
+          mv semver-from-git/bin/semver-from-git /usr/local/bin/semver-from-git && chmod +x /usr/local/bin/semver-from-git
+          mv semver-from-git/lib/* /usr/local/lib/
+          rm -rf semver-from-git.tar.bz2
       - run: |
           wget https://github.com/aktau/github-release/releases/download/v0.7.2/linux-amd64-github-release.tar.bz2
           tar jxvf linux-amd64-github-release.tar.bz2
