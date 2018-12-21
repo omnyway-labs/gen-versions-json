@@ -38,19 +38,18 @@
 (define (sys cmd)
   (string-split (with-output-to-string (lambda () (system cmd))) "\n"))
 
-(define (generate-json)
-  (define raw-list (sys "ls -d retailers/*/*"))
-
+(define (generate-json dir-prefix)
+  (define raw-list (sys (format "ls -d ~a/*/*" dir-prefix)))
   (define results (for/hash ([dir raw-list])
     (define split-dir (~> dir
-        (string-trim #rx"retailers/" #:right? #f)
+        (string-trim (regexp(format "~a/" dir-prefix)) #:right? #f)
         (string-split "/" #:repeat? #t)))
     (cond
       [(> (length split-dir) 1) ;; Filter out any single level directories
         (let ([final-dir (string-join (list (first split-dir) (second split-dir)) "/")])
           (~> final-dir
-            ;;   Lookup short sha for retailers/dir
-            (format "git log -n 1 --pretty=format:'%h' retailers/~a" _)
+            ;;   Lookup short sha for <dir-prefix>/dir
+            (format "git log -n 1 --pretty=format:'%h' ~a/~a" dir-prefix _)
             sys
             first
 

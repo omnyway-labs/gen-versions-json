@@ -42,9 +42,7 @@ If a specified directory has changed files under it
 (module+ main
   ;; Main entry point, executed when run with the `racket` executable or DrRacket.
   (define verbose-mode (make-parameter #f))
-  (define profiling-on (make-parameter #f))
-  (define optimize-level (make-parameter 0))
-  (define link-flags (make-parameter null))
+  (define dir-prefix (make-parameter "retailers"))
 
   (define file-to-compile
     (command-line
@@ -52,6 +50,9 @@ If a specified directory has changed files under it
      #:once-each
      [("-v" "--verbose") "Compile with verbose messages"
                          (verbose-mode #t)]
+     [("-p" "--dir-prefix") prf
+                            "Override top level directory (defaults to \"retailers\")"
+                         (dir-prefix prf)]
      ))
 
-    (generate-json))
+    (generate-json (dir-prefix)))
